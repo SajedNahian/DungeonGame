@@ -43,6 +43,25 @@ public class Enemy : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        enemyMovement();
+        enemyCheckDeath();
+    }
+
+    void enemyCheckDeath ()
+    {
+        if (hp <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Destroy(this.gameObject);
+    }
+
+    void enemyMovement ()
+    {
         if (!gettingKnockbacked)
         {
             if ((target.position.x - transform.position.x) < -.2)
@@ -78,11 +97,18 @@ public class Enemy : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        print ("Hit");
-        renderer.material.color = Color.red;
-        StartCoroutine(returnColor(.5f));
-        gettingKnockbacked = true;
-        StartCoroutine(KnockBack(0.2f, Player.pos - transform.position ));
+        if (collision.tag == "Sword")
+        {
+            hp -= 1;
+            renderer.material.color = Color.red;
+            StartCoroutine(returnColor(.5f));
+            gettingKnockbacked = true;
+            StartCoroutine(KnockBack(0.2f, Player.pos - transform.position));
+        } else if (collision.tag == "Player")
+        {
+            //print("HUMAN!!");
+            collision.GetComponent<Player>().hitPlayer(.2f, transform.position - Player.pos);
+        }
     }
 
     IEnumerator KnockBack (float knockDur, Vector3 knockBackDir)

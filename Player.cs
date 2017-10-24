@@ -6,10 +6,12 @@ public class Player : MonoBehaviour {
 
     public float speed;
     public static Vector3 pos;
-	// Use this for initialization
-	void Start () {
-		
-	}
+    private bool gettingKnockbacked;
+    Renderer renderer;
+    // Use this for initialization
+    void Awake () {
+        renderer = GetComponent<Renderer>();
+    }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
@@ -36,5 +38,35 @@ public class Player : MonoBehaviour {
         temp.x += h1;
         temp.y += v1;
         transform.position = temp;
+    }
+
+    public void hitPlayer(float knockDur, Vector3 knockBackDir)
+    {
+        renderer.material.color = Color.red;
+        StartCoroutine(returnColor(.5f));
+        gettingKnockbacked = true;
+        StartCoroutine(KnockBack(0.2f, knockBackDir));
+    }
+
+    private IEnumerator KnockBack(float knockDur, Vector3 knockBackDir)
+    {
+        float timer = 0;
+        while (knockDur > timer)
+        {
+            timer += Time.deltaTime;
+            print("adding force");
+            GetComponent<Rigidbody2D>().AddForce(new Vector3(knockBackDir.x * -10, knockBackDir.y * -10, 0));
+            //GetComponent<Rigidbody2D>().AddForce(new Vector3(100, 100, 0));
+        }
+        //StartCoroutine(returnKnockback(.5f));
+        //renderer.material.color = Color.white;
+        yield return 0;
+    }
+
+    IEnumerator returnColor(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        renderer.material.color = Color.white;
     }
 }
